@@ -8,5 +8,7 @@
      "js": ["content.js"],
      "run_at": "document_end"
     }
-  ]
+  ],
+  "icons": { "16": "hacker.png",
+           "32": "hacker-32.png"}
 }
