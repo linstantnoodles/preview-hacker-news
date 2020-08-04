@@ -29,8 +29,10 @@ storyTableElement.addEventListener("mouseover", function(event) {
         })
       }
     }, 500);
+
     event.target.addEventListener("mouseleave", (event) => {
       clearTimeout(timer);
+      event.target.removeEventListener("mouseleave");
     })
   }
 });
