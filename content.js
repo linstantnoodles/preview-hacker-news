@@ -1,37 +1,5 @@
-let storyTableElement = document.querySelector("table.itemlist");
 let commentsCache = {};
-
-/*function initDebugReporter(text) {
-    let itemHtml = `<div class="hoverhackernews-debug"><p>${text}</p></div>`
-    let template = document.createElement('template');
-    itemHtml = itemHtml.trim();
-    template.innerHTML = itemHtml;
-    let node = template.content.firstChild;
-    node.style.position = "fixed";
-    node.style.left = "800px";
-    node.style.top = "200px";
-    node.style.border = "solid 1px red";
-    node.style.width = "300px";
-    node.style.height = "300px";
-    document.body.appendChild(node);
-    return node;
-}
-
-
-let debugNode = initDebugReporter();
-
-function debugPosition(el) {
-  let rect = el.getBoundingClientRect();
-  let top = rect.top;
-  let right = rect.right;
-  let bottom = rect.bottom;
-  let x = rect.x;
-  let y = rect.y;
-  let width = rect.width;
-  let height = rect.height;
-  let stats = `top: ${top} , right: ${right} , bottom: ${bottom}, x: ${x}, y: ${y}, width: ${width}, height: ${height}`;
-  debugNode.innerHTML = stats;
-}*/
+let storyTableElement = document.querySelector("table.itemlist");
 
 storyTableElement.addEventListener("mouseover", function(event) {
   if (event.target && event.target.nodeName == "A" && event.target.text.indexOf("comment") >= 0 && !event.target.classList.contains("hoverhackernews-link")) {
@@ -39,8 +7,6 @@ storyTableElement.addEventListener("mouseover", function(event) {
     let trow = event.target.closest("tr").previousSibling;
     let href = trow.getElementsByClassName("storylink")[0];
     let storyId = trow.getAttribute("id");
-    //debugPosition(event.target);
-
     if (commentsCache[storyId]) {
       let toDelete = trow.getElementsByClassName("hoverhackernews-comments");
       for (let i = 0; i < toDelete.length; i ++) {
@@ -52,7 +18,7 @@ storyTableElement.addEventListener("mouseover", function(event) {
       commentsCache[storyId] = {};
       getStoryTopComments(storyId, 3).then((data) => {
         commentsCache[storyId]["data"] = data;
-        let itemElement = commentsHtmlEl(event.target.text, href, commentsCache[storyId]["data"], event.target);
+        let itemElement = commentsHtmlEl(event.target.text, event.target.getAttribute('href'), commentsCache[storyId]["data"], event.target);
         itemElement.addEventListener("mouseleave", function(event) {
           event.target.style.display = "none";
         });
@@ -89,7 +55,7 @@ function getStoryTopComments(story_id, count) {
 
 function commentsHtmlEl(title, url, comments, el) {
     let itemHtml = '<td class="hoverhackernews-comments">';
-    itemHtml += `<div><a href="${url}" class="hoverhackernews-link">${title}</a><span> for ${url}</span></div><br/>`;
+    itemHtml += `<div><a href="${url}" class="hoverhackernews-link">${title}</a></div><br/>`;
     if (comments.length) {
      if (comments[0])  {
         itemHtml += `<div><span>${comments[0]["by"]}</span><hr><p>${comments[0]["text"]}</p></div>`;
@@ -103,7 +69,7 @@ function commentsHtmlEl(title, url, comments, el) {
     } else {
       itemHtml += '<div><p>No comments yet</p></div>';
     }
-    itemHtml += '<div><p>...</p></div></td>';
+    itemHtml += `<div><p><a href="${url}">...</a></p></div></td>`;
     let template = document.createElement('template');
     itemHtml = itemHtml.trim();
     template.innerHTML = itemHtml;
