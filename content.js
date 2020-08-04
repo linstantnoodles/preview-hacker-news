@@ -3,30 +3,35 @@ let storyTableElement = document.querySelector("table.itemlist");
 
 storyTableElement.addEventListener("mouseover", function(event) {
   if (event.target && event.target.nodeName == "A" && event.target.text.indexOf("comment") >= 0 && !event.target.classList.contains("hoverhackernews-link")) {
-    hideAllComments();
-    let trow = event.target.closest("tr").previousSibling;
-    let href = trow.getElementsByClassName("storylink")[0];
-    let storyId = trow.getAttribute("id");
-    if (commentsCache[storyId]) {
-      let toDelete = trow.getElementsByClassName("hoverhackernews-comments");
-      for (let i = 0; i < toDelete.length; i ++) {
-        toDelete[i].style.display = "";
-        toDelete[i].style.left = `${event.target.getBoundingClientRect().left}px`;
-        toDelete[i].style.top = `${event.target.getBoundingClientRect().top + window.scrollY}px`;
+    let timer = window.setTimeout(() => {
+      hideAllComments();
+      let trow = event.target.closest("tr").previousSibling;
+      let href = trow.getElementsByClassName("storylink")[0];
+      let storyId = trow.getAttribute("id");
+      if (commentsCache[storyId]) {
+        let toDelete = trow.getElementsByClassName("hoverhackernews-comments");
+        for (let i = 0; i < toDelete.length; i ++) {
+          toDelete[i].style.display = "";
+          toDelete[i].style.left = `${event.target.getBoundingClientRect().left}px`;
+          toDelete[i].style.top = `${event.target.getBoundingClientRect().top + window.scrollY}px`;
+        }
+      } else {
+        commentsCache[storyId] = {};
+        getStoryTopComments(storyId, 3).then((data) => {
+          commentsCache[storyId]["data"] = data;
+          let itemElement = commentsHtmlEl(event.target.text, event.target.getAttribute('href'), commentsCache[storyId]["data"], event.target);
+          itemElement.addEventListener("mouseleave", function(event) {
+            event.target.style.display = "none";
+          });
+          trow.appendChild(itemElement);
+          event.target.style.textDecoration = "underline";
+          event.target.style.textDecorationColor = "white";
+        })
       }
-    } else {
-      commentsCache[storyId] = {};
-      getStoryTopComments(storyId, 3).then((data) => {
-        commentsCache[storyId]["data"] = data;
-        let itemElement = commentsHtmlEl(event.target.text, event.target.getAttribute('href'), commentsCache[storyId]["data"], event.target);
-        itemElement.addEventListener("mouseleave", function(event) {
-          event.target.style.display = "none";
-        });
-        trow.appendChild(itemElement);
-        event.target.style.textDecoration = "underline";
-        event.target.style.textDecorationColor = "white";
-      })
-    }
+    }, 500);
+    event.target.addEventListener("mouseleave", (event) => {
+      clearTimeout(timer);
+    })
   }
 });
 
